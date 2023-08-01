@@ -20,7 +20,7 @@ const Dashboard = () => {
         setIsLoading(true);
     
         try {
-            const response = await fetch('http://localhost:10081/api/example/jobmatching');
+            const response = await fetch('http://localhost:10082/api/example/jobmatching');
             const data = await response.json();
             console.log(data)
             if (data.length > 0) {

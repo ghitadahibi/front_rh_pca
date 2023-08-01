@@ -1,0 +1,80 @@
+.mon-bouton-orange {
+    background-color: #ff7f00;
+   border-color: #ff7f00;
+   
+  }
+.mon-bouton-rouge{
+    background-color: red;
+    border-color: red
+}
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  }
+  
+  .modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    max-width: 500px;
+    width: 100%;
+    max-height: 80%;
+    overflow-y: auto;
+    text-align: center;
+    position: relative;
+  }
+  
+  .modal-content form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .modal-content label {
+    margin-top: 10px;
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 16px;
+  }
+  
+  .modal-content input,
+  .modal-content button {
+    margin-bottom: 10px;
+    padding: 5px;
+    border-radius: 5px;
+    border: none;
+    width: 100%;
+    max-width: 300px;
+  }
+  
+  .modal-content button {
+    background-color: #ff7f00;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+    margin-left: 0px;
+  }
+  
+  .modal-content button:hover {
+    background-color: #ff7f00;
+  }
+  
+ 
+ 
+  .modal-content button {
+    text-align: center;
+  }
+
+.butt{
+    color:aqua
+}
