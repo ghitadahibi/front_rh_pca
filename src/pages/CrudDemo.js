@@ -5,23 +5,78 @@ import { DataTable } from 'primereact/datatable';
 import { InputText } from 'primereact/inputtext';
 import { Toolbar } from 'primereact/toolbar';
 import { Toast } from 'primereact/toast';
+import { Modal,message } from 'antd';
 import '../../src/pages/Crud.css'
+
 const CrudDemo = () => {
   const [visible, setVisible] = useState(false);
   const [jobOffers, setJobOffers] = useState([]);
   const toast = useRef(null);
   const [showModal, setShowModal] = useState(false);
+  const [expandedRows, setExpandedRows] = useState(new Set());
+  const [page, setPage] = useState(0);
+  const [size, setSize] = useState(5);
+  const handleDeleteClick = async () => {
+    try {
+      const response = await fetch('http://localhost:10082/api/example/joboffers', {
+        method: 'DELETE',
+      });
+  
+      if (response.ok) {
+        console.log('Job offers deleted successfully');
+  
+        // Mettre à jour la liste des offres d'emploi
+        const updatedJobOffers = jobOffers.filter((jobOffer) => !jobOffer.isSelected);
+        setJobOffers(updatedJobOffers);
+  
+        toast.current.show({ severity: 'success', summary: 'Supprimé avec succès', life: 3000 });
+      } else {
+        console.error('Error deleting job offers');
+      }
+    } catch (error) {
+      console.error('Error deleting job offers', error);
+    }
+  };
+  const handleDeleteone = async (jobOfferName
+    ) => {
+  try {
+    const response = await fetch(`http://localhost:10082/api/example/joboffers/${jobOfferName}`, {
+      method: 'DELETE',
+    });
+   
+    console.log(jobOfferName)
+    if (response.ok) {
+      console.log(`Job offer with ID ${jobOfferName
+      } deleted successfully`);
 
-  const leftToolbarTemplate = () => {
+      // Mettre à jour la liste des offres d'emploi
+      const updatedJobOffers = jobOffers.filter((jobOffer) => jobOffer.jobOfferName
+      !== jobOfferName
+      );
+      setJobOffers(updatedJobOffers);
+
+      toast.current.show({ severity: 'success', summary: 'Supprimé avec succès', life: 3000 });
+    } else {
+      console.error('Error deleting job offer');
+    }
+  } catch (error) {
+    console.error('Error deleting job offer', error);
+  }
+};
+
+
+   const leftToolbarTemplate = () => {
     return (
       <React.Fragment>
         <div className="my-2">
           <Button label="Nouveau" icon="pi pi-plus" className="mon-bouton-orange mr-2" onClick={handleApplyClick} />
-          <Button label="Supprimer" icon="pi pi-trash" className="mon-bouton-rouge" />
+          <Button label="Supprimer" icon="pi pi-trash" className="mon-bouton-rouge" onClick={handleDeleteClick } />
         </div>
       </React.Fragment>
     );
   };
+
+  
 
   const productDialogFooter = (
     <>
@@ -43,7 +98,16 @@ const CrudDemo = () => {
   const actionBodyTemplate = (rowData) => {
     return (
       <div className="actions">
-        <Button icon="pi pi-trash" className="p-button-rounded p-button-warning mt-2" />
+<Button
+  icon="pi pi-trash"
+  className="p-button-rounded p-button-warning mt-2"
+  onClick={() => rowData.jobOfferName
+    && handleDeleteone(rowData.jobOfferName
+      )}
+/>
+
+
+
       </div>
     );
   };
@@ -83,21 +147,46 @@ const CrudDemo = () => {
     } catch (error) {
       console.error(error);
     }
-
+// Handle form submission here
+message.success('Job offer added');
     setShowModal(false);
 
   };
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await fetch('http://localhost:10082/api/example/joboffer');
+      const response = await fetch(`http://localhost:10082/api/example/joboffer?page=${page}&size=${size}`);
       const data = await response.json();
       console.log(data);
       setJobOffers(data);
     };
 
     fetchData();
-  }, []);
+  }, [page, size]);
+  const contentBodyTemplate = (rowData) => {
+    const maxLines = 3;
+    const isExpanded = expandedRows.has(rowData.id);
+    const content = isExpanded ? rowData.content : rowData.content.split('\n').slice(0, maxLines).join('\n');
+    return (
+      <div>
+        <pre>{content}</pre>
+        {rowData.content.split('\n').length > maxLines && (
+          <Button className="butt" label={isExpanded ? 'Voir moins' : 'Voir plus'} onClick={() => handleExpandClick(rowData.id)} />
+        )}
+      </div>
+    );
+  };
+  const handleExpandClick = (rowId) => {
+    setExpandedRows((prevExpandedRows) => {
+      const newExpandedRows = new Set(prevExpandedRows);
+      if (newExpandedRows.has(rowId)) {
+        newExpandedRows.delete(rowId);
+      } else {
+        newExpandedRows.add(rowId);
+      }
+      return newExpandedRows;
+    });
+  };  
 
   return (
     <div className="grid crud-demo">
@@ -108,8 +197,12 @@ const CrudDemo = () => {
           <DataTable
             dataKey="id"
             paginator
-            rows={10}
-            rowsPerPageOptions={[5, 10, 25]}
+            rows={size}
+            first={page * size}
+            onPage={(e) => {
+                            setPage(e.page);
+                            setSize(e.rows);
+                        }}
             className="datatable-responsive"
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             currentPageReportTemplate="Presentation {first} a {last} offre d'emploie {totalRecords} "
@@ -120,26 +213,35 @@ const CrudDemo = () => {
           >
             <Column selectionMode="multiple" headerStyle={{ width: '3rem' }}></Column>
             <Column field="jobOfferName" header="JobofferName" sortable headerStyle={{ width: '14%',minWidth: '10rem' }} />
-            <Column field="content" header="Content" sortable headerStyle={{ width: '14%', minWidth: '10rem' }} />
+            <Column field="content" header="Content" sortable headerStyle={{ width: '14%', minWidth: '10rem' }} body={contentBodyTemplate}/>
             <Column body={actionBodyTemplate} headerStyle={{ width: '6rem' }}></Column>
           </DataTable>
           <div>
-            {showModal && (
-              <div className="modal">
-              <div className="modal-content">
-                <span className="close" onClick={handleCloseModal}>&times;</span>
-                
-                <form  onSubmit={handleSave}>
-                  <label htmlFor="job_name">job_name:</label>
-                  <input type="text" id="joboffre_nom" name="joboffre_nom" required />
-                  <label htmlFor="joboffre">joboffre:</label>
-                  <input type="file" id="joboffre" name="joboffre" accept=".pdf,.doc,.docx" required />
-                  <button type="submit" className="butt" >Envoyer</button>
-                </form>
-                <p>*veuillez remplir les champs correctement</p>
-              </div>
-            </div>
-            )}
+          <Modal
+        title="Ajouter un offre d'emploie"
+        visible={showModal}
+        onCancel={handleCloseModal}
+        footer={[
+          <Button key="cancel" className='annuler' onClick={handleCloseModal}>
+            Annuler
+          </Button>,
+          <Button key="postuler" className='orange' onClick={handleSave}>
+            Postuler
+          </Button>,
+        ]}
+      >
+        <form onSubmit={handleSave}>
+          <div className="form-group">
+            <label htmlFor="joboffre_nom">job_name:</label>
+            <input type="text" id="joboffre_nom" className='text' name="joboffre_nom" placeholder='Entrer job offer name' required />
+          </div>
+          <div className="form-group">
+            <label htmlFor="joboffre">joboffre:</label>
+            <input type="file" id="joboffre" name="joboffre" className='file' placeholder='Entrer job offer'  accept=".pdf,.doc,.docx" required />
+          </div>
+          <p>*veuillez remplir les champs correctement</p>
+        </form>
+      </Modal>
           </div>
         </div>
       </div>

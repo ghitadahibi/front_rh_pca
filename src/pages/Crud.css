@@ -1,11 +1,13 @@
 .mon-bouton-orange {
     background-color: #ff7f00;
    border-color: #ff7f00;
+   border-radius: 0px;
    
   }
 .mon-bouton-rouge{
     background-color: red;
-    border-color: red
+    border-color: red;
+    border-radius: 0px;
 }
   .modal {
     position: fixed;
@@ -76,5 +78,48 @@
   }
 
 .butt{
-    color:aqua
+    background-color: #ff7f00;
+    border-radius: 0px;
+   
+    border-color: #ff7f00;
+  
+    
+    
+}
+
+div.butt:hover {
+  background-color: #ff7f00;
+}
+.orange{
+  background-color: #ff7f00;
+  border-radius: 0px;
+  color: white;
+  font-weight: bold;
+  border-color: #ff7f00;
+  margin-right: 50px;
+}
+.orange:hover{
+  background-color: #ff7f00;
+  border-radius: 0px;
+  color: #ff7f00;
+  border-color: #ff7f00;
+}
+.annuler{
+  border-radius: 0px;
+  border-color: #fff;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  color:black
+}
+.text {
+  width: 70%;
+  padding: 10px;
+  border-radius: 0px;
+  border: 1px solid #ddd;
+}
+.file {
+  width: 70%;
+  padding: 10px;
+  border-radius: 0px;
+  border: 1px solid #ddd;
 }

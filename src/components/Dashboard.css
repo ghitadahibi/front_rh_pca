@@ -2,3 +2,47 @@
  color: #000;
 
 }
+.p-datatable tbody .selected-row {
+  background-color: rgb(219, 219, 219) !important;
+  color: black !important;
+}
+
+.p-datatable tbody .p-selectable-row.selected-row {
+  background-color: rgb(221, 221, 221) !important;
+  color: black !important;
+}
+
+ .p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
+  background-color: #ff7f00;
+  border-color: #ff7f00;
+  border-radius: 0px;
+}
+h5{
+  color: #ff7f00;
+  font-weight: bold;
+}
+
+.p-slider-handle {
+  background-color: #ff7f00 !important;
+  border-color: #ff7f00 !important;
+
+}
+.p-slider-handle:hover {
+  background-color: #ff7f00 !important;
+  border-color: #ff7f00 !important;
+  
+}
+.p-slider-range {
+  background-color: #ff7f00 !important;
+  border-color: #ff7f00 !important;
+}
+.p-slider-range:hover {
+  background-color: #ff7f00 !important;
+  border-color: #ff7f00 !important;
+}
+
+
+.p-checkbox-box.p-highlight {
+  background-color: #ff7f00 !important;
+  border-color: #ff7f00 !important;
+}
