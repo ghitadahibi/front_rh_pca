@@ -4,21 +4,24 @@ import { HashRouter } from 'react-router-dom';
 import AppWrapper from './AppWrapper';
 import reportWebVitals from './reportWebVitals';
 import { QueryClient, QueryClientProvider } from 'react-query';
+import { BrowserRouter } from 'react-router-dom';
+import App from './App';
+import {Provider} from 'react-redux';
+import {createStore} from 'redux';
+import rootReducer from '../src/reducers/rootReducers';
 
 const queryClient = new QueryClient();
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+
 root.render(
     <React.StrictMode>
-        <QueryClientProvider client={queryClient}>
-            {/* <RouterProvider router={router}> */}
-            <HashRouter>
-                <AppWrapper></AppWrapper>
-            </HashRouter>
-            {/* </RouterProvider> */}
-        </QueryClientProvider>
+      <BrowserRouter>
+     
+      <AppWrapper />
+      </BrowserRouter>
     </React.StrictMode>
-);
+  );
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

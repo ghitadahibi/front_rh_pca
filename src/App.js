@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { classNames } from 'primereact/utils';
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { Route, Routes, useLocation,Redirect } from 'react-router-dom';
 import { CSSTransition } from 'react-transition-group';
 
 import AppTopbar from './AppTopbar';
@@ -35,7 +35,7 @@ import TimelineDemo from './pages/TimelineDemo';
 import Invoice from './pages/Invoice';
 import Help from './pages/Help';
 import EmptyPage from './pages/EmptyPage';
-
+import KecloakLoginPage from './components/KecloakLoginPage';
 import PrimeReact from 'primereact/api';
 import { Tooltip } from 'primereact/tooltip';
 
@@ -70,7 +70,7 @@ const App = () => {
         {
         label: 'Favorites',
         icon: 'pi pi-fw pi-home',
-        items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' }]
+        items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/dash' }]
     },
        
         {
@@ -390,7 +390,10 @@ const App = () => {
             <div className="layout-main">
                 <div className="layout-content">
                     <Routes>
-                        <Route path="/" element={<Dashboard />} />
+                       
+                        
+                    <Route path="/" element={<Dashboard />} />
+                    
                         <Route path="/formlayout" element={<FormLayoutDemo />} />
                         <Route path="/input" element={<InputDemo />} />
                         <Route path="/floatlabel" element={<FloatLabelDemo />} />
@@ -409,7 +412,7 @@ const App = () => {
                         <Route path="/blocks" element={<BlocksDemo />} />
                         <Route path="/misc" element={<MiscDemo />} />
                         <Route path="/icons" element={<IconsDemo />} />
-                        <Route path="/crud" element={<CrudDemo />} />
+                       
                         <Route path="/timeline" element={<TimelineDemo />} />
                         <Route path="/calendar" element={<CalendarDemo />} />
                         <Route path="/invoice" element={<Invoice />} />

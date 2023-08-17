@@ -17,9 +17,15 @@ const CrudDemo = () => {
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(5);
   const handleDeleteClick = async () => {
+    const accessToken = getStoredAccessToken();
+    console.log(accessToken)
+      if (accessToken) {
     try {
       const response = await fetch('http://localhost:10082/api/example/joboffers', {
         method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        }
       });
   
       if (response.ok) {
@@ -35,13 +41,20 @@ const CrudDemo = () => {
       }
     } catch (error) {
       console.error('Error deleting job offers', error);
-    }
+    }}
   };
   const handleDeleteone = async (jobOfferName
     ) => {
+      const accessToken = getStoredAccessToken();
+      console.log(accessToken)
+        if (accessToken) {
   try {
     const response = await fetch(`http://localhost:10082/api/example/joboffers/${jobOfferName}`, {
       method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+
     });
    
     console.log(jobOfferName)
@@ -61,7 +74,7 @@ const CrudDemo = () => {
     }
   } catch (error) {
     console.error('Error deleting job offer', error);
-  }
+  }}
 };
 
 
@@ -128,18 +141,23 @@ const CrudDemo = () => {
     const formData = new FormData();
     formData.append('joboffre_nom', joboffre_nom);
     formData.append('joboffre', joboffre);
-
-    try {
+    const accessToken = getStoredAccessToken();
+    console.log(accessToken)
+      if (accessToken) {
+       try {
       const response = await fetch('http://localhost:10082/api/example/uploadjoboffre', {
         method: 'POST',
-        body: formData
+        body: formData,
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        }
       });
-
       if (!response.ok) {
         throw new Error('Une erreur est survenue lors de l\'appel à l\'API REST');
       }
 
       const responseBody = await response.text();
+      console.log(responseBody)
       console.log('Réponse de l\'API REST :', responseBody);
     } catch (error) {
       console.error(error);
@@ -148,18 +166,32 @@ const CrudDemo = () => {
 message.success('Job offer added');
     setShowModal(false);
 
+  }};
+  
+  const getStoredAccessToken = () => {
+    return localStorage.getItem('accessToken');
   };
-
   useEffect(() => {
     const fetchData = async () => {
-      const response = await fetch(`http://localhost:10082/api/example/joboffer?page=${page}&size=${size}`);
-      const data = await response.json();
-      console.log(data);
-      setJobOffers(data);
+      const accessToken = getStoredAccessToken();
+      if (accessToken) {
+        try {
+          const response = await fetch(`http://localhost:10082/api/example/joboffer?page=${page}&size=${size}`, {
+            headers: {
+              'Authorization': `Bearer ${accessToken}`
+            }
+          });
+          const data = await response.json();
+          console.log(data);
+          setJobOffers(data);
+        } catch (error) {
+          console.error(error);
+        }
+      }
     };
-
+  
     fetchData();
-  }, [page, size]);
+  }, []);
   const contentBodyTemplate = (rowData) => {
     const maxLines = 3;
     const isExpanded = expandedRows.has(rowData.id);
@@ -186,6 +218,7 @@ message.success('Job offer added');
   };  
 
   return (
+    
     <div className="grid crud-demo">
       <div className="col-12">
         <div className="card">

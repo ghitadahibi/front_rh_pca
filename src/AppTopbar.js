@@ -5,16 +5,7 @@ import bp from '../src/assets/bp.png';
 import '../src/AppTopbar.css'
 import { Link } from 'react-router-dom'
 const AppTopbar = (props) => {
-    const navigate = useNavigate();
-
-    const onTopbarItemClick = (event, item) => {
-        if (props.onTopbarItemClick) {
-            props.onTopbarItemClick({
-                originalEvent: event,
-                item: item
-            });
-        }
-    };
+ 
 
     return (
         <div className="app-topbar">
@@ -25,11 +16,7 @@ const AppTopbar = (props) => {
                     </a>
                 </div>
                
-                <div class="account">
-                <Link to='/login'>
-                  Se connecter 
-                </Link>  
-                </div>
+               
             </nav>
         </div>
     );

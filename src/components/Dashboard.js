@@ -6,7 +6,9 @@ import { Column } from 'primereact/column';
 import { FilterMatchMode } from 'primereact/api';
 import { InputText } from 'primereact/inputtext';
 import { Slider } from 'primereact/slider';
-import '../../src/components/Dashboard.css'
+import '../../src/components/Dashboard.css';
+import queryString from 'query-string';
+
 
 const Dashboard = () => {
     const [filters, setFilters] = useState({
@@ -21,28 +23,114 @@ const Dashboard = () => {
     const [page, setPage] = useState(0);
     const [size, setSize] = useState(5);
     const [sliderValue, setSliderValue] = useState(5);
+   
 
-    const getAllData = async () => {
+    const getAllData = async (accessToken) => {
+        const formData = new FormData();
         setIsLoading(true);
         try {
-            const response = await fetch(`http://localhost:10082/api/example/jobmatching?page=${page}&size=${size}`);
-            const data = await response.json();
-            console.log(data)
-            if (data.length > 0) {
-                setColumns(Object.keys(data[0]));
-                setData(data);
+          const response = await fetch(`http://localhost:10082/api/example/jobmatching?page=${page}&size=${size}`, {
+            headers: {
+              'Authorization': `Bearer ${accessToken}`
             }
-            setIsLoading(false);
+          });
+          const data = await response.json();
+          console.log('voici jobmatching', data);
+          if (data.length > 0) {
+            setColumns(Object.keys(data[0]));
+            setData(data);
+          }
+          setIsLoading(false);
         } catch (error) {
-            console.error(error);
-            setIsLoading(false);
+          console.error(error);
+          setIsLoading(false);
         }
-    };
+      };
+    
+      const getAccessToken = async () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        if (code) {
+          try {
+            const response = await fetch('http://localhost:8080/realms/srs/protocol/openid-connect/token', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              body: queryString.stringify({
+                grant_type: 'authorization_code',
+                client_id: 'front-rh',
+                client_secret: 'bAdgZknXZS3CqEoXPiL251FJDHHJPWbH',
+                code: code,
+                redirect_uri: 'http://localhost:3001/dash',
+              })
+            });
+            const data = await response.json();
+            console.log('VOICI DATA', data);
+            const refreshToken = data.refresh_token;
+            console.log('Refresh Token:', refreshToken);
+            if (refreshToken) {
+              // Stockez le refresh token avant de l'utiliser
+              storeRefreshToken(refreshToken);
+              // Utilisez le refresh token pour obtenir un nouvel access token
+              getNewAccessToken(refreshToken);
+            }
+          } catch (error) {
+            console.error(error);
+          }
+        }
+      };
+    
+      const getNewAccessToken = async (refreshToken) => {
+        try {
+          const response = await fetch('http://localhost:8080/realms/srs/protocol/openid-connect/token', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: queryString.stringify({
+              grant_type: 'refresh_token',
+              client_id: 'front-rh',
+              client_secret: 'bAdgZknXZS3CqEoXPiL251FJDHHJPWbH',
+              refresh_token: refreshToken,
+            })
+          });
+          const data = await response.json();
+          console.log('New Access Token:', data.access_token);
+          const accessToken = data.access_token;
+          if (accessToken) {
+            // Stockez le nouvel access token
+            storeAccessToken(accessToken);
+            // Envoyez le nouvel access token au backend
+            getAllData(accessToken);
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      };
+      useEffect(() => {
+        const storedRefreshToken = localStorage.getItem('refreshToken');
+        console.log('Stored Refresh Token:', storedRefreshToken);
+        if (storedRefreshToken) {
+          // Si un refresh token est déjà stocké, utilisez-le pour obtenir un nouvel access token
+          getNewAccessToken(storedRefreshToken);
+        } else {
+          // Sinon, obtenez un nouveau refresh token et un access token
+          getAccessToken();
+        }
+      }, []);
+    
+      const storeRefreshToken = (refreshToken) => {
+        localStorage.setItem('refreshToken', refreshToken);
+      };
+      
+      const storeAccessToken = (accessToken) => {
+        localStorage.setItem('accessToken', accessToken);
+      };
 
-    useEffect(() => {
-        getAllData();
-    }, [page, size]);
-
+    
+      
+  
     const renderColumns = (el) => {
         if (el === 'job_name' || el === 'email' || el === 'similarity_score') {
             return (
@@ -113,7 +201,14 @@ const Dashboard = () => {
         return `${value}`;
     };
 
+
+
+
+
+
+
     return (
+        
         <div className="grid layout-dashboard">
             <div className="col-12 xl:col-12">
                 <div className="card card-w-title global-sales ui-fluid">
