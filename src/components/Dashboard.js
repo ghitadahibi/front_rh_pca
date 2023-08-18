@@ -127,7 +127,34 @@ const Dashboard = () => {
       const storeAccessToken = (accessToken) => {
         localStorage.setItem('accessToken', accessToken);
       };
-
+       const getStoredAccessToken = () => {
+    return localStorage.getItem('accessToken');
+  };
+      const sendSelectedRows = async () => {
+        const accessToken = getStoredAccessToken();
+       
+        // Get the selected rows from your selectedData state variable
+        const selectedRows = selectedData;
+        console.log(selectedRows)
+      
+        // Send the selected rows to your backend
+        try {
+          const response = await fetch('http://localhost:10082/api/example/getselectedrows', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${accessToken}`
+              
+            },
+            body: JSON.stringify({ selectedRows })
+          });
+          const data = await response.json();
+          console.log('Selected rows sent', data);
+        } catch (error) {
+          console.error(error);
+        }
+      };
+      
     
       
   
@@ -188,6 +215,7 @@ const Dashboard = () => {
     const rowClassName = (rowData) => {
         return {
             'selected-row': selectedData.some((data) => data.id === rowData.id),
+            
         };
     };
 
@@ -250,6 +278,7 @@ const Dashboard = () => {
                     </DataTable>
                 </div>
             </div>
+            <button onClick={sendSelectedRows}>Send Selected Rows</button>
         </div>
     );
 };
